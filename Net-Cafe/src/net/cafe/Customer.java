@@ -152,7 +152,7 @@ public class Customer {
         }
 
         System.out.println("==========================================");
-        System.out.println("Enter a computer ID to start, or 0 to go back.");
+        System.out.println("Enter a computer ID to start: ");
         System.out.println("---");
 
         // 3. Pick a computer
@@ -160,8 +160,6 @@ public class Customer {
             System.out.print("Enter computer ID: ");
             String choice = sc.nextLine().trim();
 
-            if (choice.equals("0")) {
-                return;
             }
 
             File chosenFile = null;
