@@ -1,0 +1,3 @@
+Burger,Food,85.0,15
+Iced Coffee,Drink,65.0,41
+Fries,Food,45.0,30
