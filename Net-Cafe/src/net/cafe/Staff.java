@@ -109,10 +109,8 @@ public class Staff {
             return;
         }
 
-        System.out.print("\nEnter Computer ID to assign (or 0 to cancel): ");
+        System.out.print("\nEnter Computer ID to assign: ");
         String compId = sc.nextLine().trim();
-
-        if (compId.equals("0")) return;
 
         File chosenFile = null;
         String[] chosen = null;
