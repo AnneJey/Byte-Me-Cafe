@@ -124,10 +124,9 @@ public class CompManage {
             System.out.println("\n===========================");
             System.out.println("   Search Computer by ID   ");
             System.out.println("===========================");
-            System.out.print("Enter Computer ID (0 to go back): ");
+            System.out.print("Enter Computer ID: ");
             String searchID = sc.nextLine().trim();
 
-            if (searchID.equals("0")) return;
 
             if (searchID.isEmpty()) {
                 System.out.println("Computer ID cannot be empty!");
@@ -158,10 +157,8 @@ public class CompManage {
             System.out.println("   Add Computer");
             System.out.println("========================");
             
-            System.out.print("Enter Computer ID (0 to cancel): ");
+            System.out.print("Enter Computer ID: ");
             String id = sc.nextLine().trim();
-
-            if (id.equals("0")) return;
 
             if (id.isEmpty() || !id.matches("[A-Za-z0-9_-]+")) {
                 System.out.println("ID can only contain letters, numbers, - and _ (no spaces or commas).");
@@ -207,10 +204,9 @@ public class CompManage {
             System.out.println("   Remove Computer");
             System.out.println("========================");
             
-            System.out.print("Enter Computer ID (0 to cancel): ");
+            System.out.print("Enter Computer ID: ");
             String id = sc.nextLine().trim();
 
-            if (id.equals("0")) return;
 
             File file = new File(FOLDER + "/" + id + ".txt");
             if (id.isEmpty() || !id.matches("[A-Za-z0-9_-]+") || !file.exists()) {
@@ -275,10 +271,8 @@ public class CompManage {
             System.out.println("   Set Hourly Rate");
             System.out.println("========================");
             
-            System.out.print("Enter Computer ID (0 to cancel): ");
+            System.out.print("Enter Computer ID: ");
             String id = sc.nextLine().trim();
-
-            if (id.equals("0")) return;
 
             File file = new File(FOLDER + "/" + id + ".txt");
             if (id.isEmpty() || !id.matches("[A-Za-z0-9_-]+") || !file.exists()) {
@@ -332,10 +326,8 @@ public class CompManage {
             System.out.println("   Set Status");
             System.out.println("========================");
             
-            System.out.print("Enter Computer ID (0 to cancel): ");
+            System.out.print("Enter Computer ID: ");
             String id = sc.nextLine().trim();
-
-            if (id.equals("0")) return;
 
             File file = new File(FOLDER + "/" + id + ".txt");
             if (id.isEmpty() || !id.matches("[A-Za-z0-9_-]+") || !file.exists()) {
