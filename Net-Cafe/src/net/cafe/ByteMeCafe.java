@@ -8,7 +8,7 @@ public class ByteMeCafe {
 
     // ---------------- START / MAIN MENU ----------------
     public static void main(String[] args) {
-        new File(FOLDER).mkdirs();
+        new File(FOLDER).mkdirs();   // create the folder if it doesn't exist
 
         boolean running = true;
         while (running) {
@@ -59,11 +59,12 @@ public class ByteMeCafe {
         }
 
         // Customer accounts (by ID like 001, or by username)
+        // data = {id, name, username, email, password}
         String[] data = findCustomer(key);
         if (data != null && data[4].equals(password)) {
             System.out.println("\nLogin Success...");
             System.out.println("Welcome, " + data[1]);
-
+            
             Customer.currentId = data[0];
             Customer.currentName = data[1];
 
@@ -132,7 +133,6 @@ public class ByteMeCafe {
                 }
             }
 
-
             // Are details valid and unused?
             if (isTaken(username, email)) {
                 System.out.println("\nAccount already exist. Please Create Another One\n");
@@ -158,7 +158,7 @@ public class ByteMeCafe {
     static void logOut() {
         System.out.println("\n=== Logging Out ===");
         System.out.println("You have successfully logged out!");
-        System.out.println("Returning to Main Menu...");
+        System.out.println("Returning to Main Menu...\n");
     }
 
     // ---------------- FILE HELPERS ----------------
