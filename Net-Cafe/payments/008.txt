@@ -1,0 +1,4 @@
+008
+Date: 2026-11-05
+Customer ID: 007
+Amount: 100

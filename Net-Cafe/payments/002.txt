@@ -1,0 +1,4 @@
+002
+Date: 2026-10-30
+Customer ID: 004
+Amount: 200
