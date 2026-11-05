@@ -1,10 +1,9 @@
 package net.cafe;
-
 import java.util.*;
 import java.io.*;
 
 public class CompManage {
-    static Scanner sc = NetCafe.sc;
+    static Scanner sc = ByteMeCafe.sc;
     static final String FOLDER = "computers";   // one .txt file per computer
 
     // ---------------- START: MANAGE COMPUTER (STAFF AND ADMIN) ----------------
