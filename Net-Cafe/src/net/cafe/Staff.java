@@ -1,5 +1,4 @@
 package net.cafe;
-
 import java.util.*;
 import java.io.*;
 
@@ -13,7 +12,7 @@ public class Staff {
         while (true) {
             System.out.println("\n===== STAFF MENU =====");
             System.out.println("1. Manage Computers");
-            System.out.println("2. Manage Inventory (add, update food and drinks)");
+            System.out.println("2. Manage Inventory");
             System.out.println("3. Manage Customers");
             System.out.println("4. Transaction History");
             System.out.println("5. Assistance Management");
