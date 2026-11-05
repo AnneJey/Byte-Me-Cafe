@@ -1,0 +1,158 @@
+package net.cafe;
+import java.util.Scanner;
+import java.io.*;
+
+public class Payment {
+    static Scanner sc = new Scanner(System.in);
+    // Display the list of PCs from the computers folder
+    static void showPcs() {
+        String[] files = new File("computers").list();
+        if (files == null) {
+            return;
+        }
+
+        // Sort the file names
+        for (int i = 0; i < files.length - 1; i++) {
+            for (int j = i + 1; j < files.length; j++) {
+                if (files[i].compareTo(files[j]) > 0) {
+                    String temp = files[i];
+                    files[i] = files[j];
+                    files[j] = temp;
+                }
+            }
+        }
+
+        System.out.println("PC List:");
+        for (int i = 0; i < files.length; i++) {
+            try {
+                BufferedReader pc = new BufferedReader(new FileReader("computers/" + files[i]));
+                String name = pc.readLine();
+                String rate = pc.readLine();
+                String status = pc.readLine();
+                pc.close();
+                System.out.println(name + " | " + rate + " | " + status);
+            } catch (IOException e) {
+                System.out.println(files[i] + " | Unable to read");
+            }
+        }
+    }
+    
+    public static void main(String[] args) {
+    }
+    static void Display(){
+        // Display menu
+        System.out.println("1. Top Up");
+        System.out.println("2. Balance");
+        System.out.print("Enter Choice: ");
+        int choice = Integer.parseInt(sc.nextLine());
+
+        if (choice == 1) {
+            double amount = 0;
+            String pcId = "";
+            String method = "";
+            double hourlyRate = 0;
+            String status = "";
+            boolean valid = false;
+
+            showPcs();
+
+            // Enter Top Up Amount, PC ID and Payment Method
+            while (!valid) {
+                System.out.print("Enter Top Up Amount: ");
+                String amountInput = sc.nextLine();
+                System.out.print("Enter PC ID: ");
+                pcId = sc.nextLine();
+                System.out.print("Enter Payment Method: ");
+                method = sc.nextLine();
+
+                // Is Input valid?
+                try {
+                    amount = Double.parseDouble(amountInput);
+
+                    // Get PC details from the PC's .txt file
+                    BufferedReader pc = new BufferedReader(new FileReader("computers/" + pcId + ".txt"));
+                    pc.readLine();
+                    hourlyRate = Double.parseDouble(pc.readLine().split(": ")[1]);
+                    status = pc.readLine().split(": ")[1];
+                    pc.close();
+
+                    valid = amount > 0 && status.equals("Available") && !method.isEmpty();
+                } catch (NumberFormatException e) {
+                    valid = false;
+                } catch (IOException e) {
+                    valid = false;
+                }
+
+                if (!valid) {
+                    // Display Error Message
+                    System.out.println("Error: Invalid input.");
+                }
+            }
+
+            // Display Receipt
+            System.out.println("Receipt");
+            System.out.println("PC ID: " + pcId);
+            System.out.println("Hourly Rate: " + hourlyRate);
+            System.out.println("Amount: " + amount);
+            System.out.println("Hours: " + (amount / hourlyRate));
+            System.out.println("Payment Method: " + method);
+
+            // Confirm payment?
+            System.out.print("Confirm payment? (yes/no): ");
+            String confirm = sc.nextLine();
+
+            if (confirm.equals("yes")) {
+                System.out.println("Payment successful");
+                // Save Transaction
+                try {
+                    FileWriter fw = new FileWriter("payment.txt", true);
+                    PrintWriter pw = new PrintWriter(fw);
+                    pw.println(pcId + "," + amount + "," + method);
+                    pw.close();
+                } catch (IOException e) {
+                    System.out.println("Error saving transaction.");
+                }
+            } else {
+                System.out.println("Payment cancelled");
+            }
+
+        } else if (choice == 2) {
+            // Display Balance
+            showPcs();
+            System.out.print("Enter PC ID: ");
+            String pcId = sc.nextLine();
+            double hourlyRate = 0;
+            double total = 0;
+
+            try {
+                // Get PC details from the PC's .txt file
+                BufferedReader pc = new BufferedReader(new FileReader("computers/" + pcId + ".txt"));
+                pc.readLine();
+                hourlyRate = Double.parseDouble(pc.readLine().split(": ")[1]);
+                pc.close();
+
+                try {
+                    BufferedReader br = new BufferedReader(new FileReader("payment.txt"));
+                    String line = br.readLine();
+                    while (line != null) {
+                        String[] parts = line.split(",");
+                        if (parts[0].equals(pcId)) {
+                            total += Double.parseDouble(parts[1]);
+                        }
+                        line = br.readLine();
+                    }
+                    br.close();
+                } catch (IOException e) {
+                    total = 0;
+                }
+
+                System.out.println("PC ID: " + pcId);
+                System.out.println("Hourly Rate: " + hourlyRate);
+                System.out.println("Balance: " + total);
+                System.out.println("Hours Left: " + (total / hourlyRate));
+            } catch (IOException e) {
+                System.out.println("Error: PC not found.");
+            }
+        }
+    }
+}
