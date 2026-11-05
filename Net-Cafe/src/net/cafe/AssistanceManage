@@ -1,0 +1,106 @@
+package net.cafe;
+
+import java.util.*;
+import java.io.*;
+
+public class AssistanceManage {
+    static Scanner sc = NetCafe.sc;
+
+    // ---------------- START: ASSISTANCE MANAGEMENT (STAFF) ----------------
+    static void manage() {
+        new File(RequestAssistance.FOLDER).mkdirs();
+
+        boolean running = true;
+        while (running) {
+            // Display Pending Request List
+            int pending = displayPending();
+
+            // Any Pending Request? (No -> Display "No Pending Request...")
+            if (pending == 0) {
+                System.out.println("\nNo Pending Request...");
+                return;
+            }
+
+            System.out.print("\nEnter request ID to handle (0 to go back): ");
+            String input = sc.nextLine().trim();
+
+            switch (input) {
+                case "0": running = false; break;
+                default: handleRequest(input);
+            }
+        }
+        // End -> back to Staff menu
+    }
+
+    // ---------------- HANDLE ONE REQUEST ----------------
+    static void handleRequest(String input) {
+        if (!input.matches("[0-9]+")) {
+            System.out.println("Invalid request ID.");
+            return;
+        }
+
+        // Select Request and Read PC ID and issue
+        File f = new File(RequestAssistance.FOLDER + "/" + input + ".txt");
+        String[] r = RequestAssistance.readRequest(f);   // {id, customerId, pcId, issue, status}
+        if (r == null || (!r[4].equals("Pending") && !r[4].equals("In Progress"))) {
+            System.out.println("Invalid request ID.");
+            return;
+        }
+
+        System.out.println("\n--- Request " + r[0] + " ---");
+        System.out.println("Customer ID : " + r[1]);
+        System.out.println("PC ID       : " + r[2]);
+        System.out.println("Issue       : " + r[3]);
+
+        // Help Customer And Set Status In Progress
+        if (RequestAssistance.saveRequest(r[0], r[1], r[2], r[3], "In Progress")) {
+            System.out.println("Status set to In Progress. Please help the customer at PC " + r[2] + ".");
+        } else {
+            return;
+        }
+
+        // Has Issue Been Resolved? (No -> keep helping, ask again)
+        boolean done = false;
+        while (!done) {
+            System.out.print("\nHas the issue been resolved? (Y/N, 0 to leave it In Progress): ");
+            String resolved = sc.nextLine().trim().toUpperCase();
+
+            if (resolved.equals("Y")) {
+                // Update Status As Resolved And Save
+                if (RequestAssistance.saveRequest(r[0], r[1], r[2], r[3], "Resolved")) {
+                    System.out.println("Status set to Resolved.");
+                }
+                done = true;
+            } else if (resolved.equals("N")) {
+                System.out.println("Request is still In Progress. Keep helping the customer.");
+            } else if (resolved.equals("0")) {
+                System.out.println("Request left as In Progress.");
+                done = true;
+            } else {
+                System.out.println("Invalid choice.");
+            }
+        }
+    }
+
+    // ---------------- DISPLAY ----------------
+    // Shows all Pending and In Progress requests. Returns how many there are.
+    static int displayPending() {
+        File[] files = new File(RequestAssistance.FOLDER).listFiles((d, name) -> name.endsWith(".txt"));
+        int count = 0;
+        if (files != null) {
+            Arrays.sort(files);
+            for (File f : files) {
+                String[] r = RequestAssistance.readRequest(f);
+                if (r != null && (r[4].equals("Pending") || r[4].equals("In Progress"))) {
+                    if (count == 0) {
+                        System.out.println("\n===== PENDING ASSISTANCE REQUESTS =====");
+                    }
+                    System.out.println("Request " + r[0] + " | Customer " + r[1] + " | PC " + r[2] + " | " + r[4]);
+                    System.out.println("   Issue: " + r[3]);
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+}
