@@ -1,0 +1,8 @@
+PC-01,100.0,Cash
+PC-03,200.0,GCash
+PC-02,50.0,Cash
+PC-02,100.0,GCash
+PC-05,25.0,Cash
+PC-05,25.0,Cash
+PC-05,25.0,Cash
+PC-05,25.0,Cash
