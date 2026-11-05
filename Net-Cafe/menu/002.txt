@@ -1,0 +1,4 @@
+002
+Name: Mineral Water
+Price: 15
+Stock: 47

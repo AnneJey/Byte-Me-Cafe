@@ -1,0 +1,4 @@
+003
+Name: Chips
+Price: 20
+Stock: 22

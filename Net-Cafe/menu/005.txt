@@ -1,0 +1,4 @@
+005
+Name: Sandwich
+Price: 45
+Stock: 12

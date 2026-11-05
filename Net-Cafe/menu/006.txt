@@ -1,0 +1,4 @@
+006
+Name: Coffee
+Price: 30
+Stock: 17
