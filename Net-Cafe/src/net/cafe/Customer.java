@@ -1,10 +1,9 @@
-
 package net.cafe;
 import java.util.*;
 import java.io.*;
 
 public class Customer {
-    static Scanner sc = NetCafe.sc;
+    static Scanner sc = ByteMeCafe.sc;
     static String currentId;
     static String currentName;
     public static void main(String[] args) {
@@ -41,7 +40,7 @@ public class Customer {
                     System.out.println("Opening Log Out Menu...\n");
                     currentId = null;
                     currentName = null;
-                    NetCafe.logOut();
+                    ByteMeCafe.logOut();
                     return;
                 default:
                     System.out.println("Invalid choice. Please try again.\n");
