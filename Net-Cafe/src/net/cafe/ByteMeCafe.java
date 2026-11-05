@@ -35,7 +35,7 @@ public class ByteMeCafe {
 
     // ---------------- LOG IN BRANCH ----------------
     static void logIn() {
-        System.out.println("\n==== Net Cafe Login ====");
+        System.out.println("\n==== Byte Me Cafe Login ====");
 
         // Enter ID or Username
         System.out.print("Enter ID or Username: ");
