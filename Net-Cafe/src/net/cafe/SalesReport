@@ -1,0 +1,223 @@
+package net.cafe;
+import java.util.*;
+import java.io.*;
+
+public class SalesReport {
+    static Scanner sc = ByteMeCafe.sc;
+    static final String PAYMENT_FOLDER = "payments";
+
+    String from;
+    String to;
+
+    // ---------------- START: SALES REPORT (ADMIN) ----------------
+    static void salesReport() {
+        // Display menu
+        System.out.println("\n===== SALES REPORT =====");
+        System.out.println("1. Payment Report");
+        System.out.println("2. Menu & Order Report");
+        System.out.println("3. Total Sales Report");
+        System.out.print("Enter Choice: ");
+        String choice = sc.nextLine().trim();
+
+        if (!choice.equals("1") && !choice.equals("2") && !choice.equals("3")) {
+            System.out.println("Invalid choice.");
+            return;
+        }
+
+        // Select Date Range
+        String[] range = selectDateRange();
+        if (range == null) {
+            return;
+        }
+
+        switch (choice) {
+            case "1": paymentReport(range[0], range[1]); break;
+            case "2": orderReport(range[0], range[1]); break;
+            case "3": totalSalesReport(range[0], range[1]); break;
+        }
+    }
+
+    // ---------------- SELECT DATE RANGE ----------------
+    static String[] selectDateRange() {
+        System.out.println("\nSelect Date Range (format: yyyy-MM-dd)");
+
+        String from = "";
+        while (from.isEmpty()) {
+            System.out.print("From: ");
+            String input = sc.nextLine().trim();
+            if (isValidDate(input)) {
+                from = input;
+            } else {
+                System.out.println("Invalid date.");
+            }
+        }
+
+        String to = "";
+        while (to.isEmpty()) {
+            System.out.print("To: ");
+            String input = sc.nextLine().trim();
+
+            if (!isValidDate(input)) {
+                System.out.println("Invalid date.");
+            } else if (input.compareTo(from) < 0) {
+                System.out.println("'To' date cannot be before the 'From' date.");
+            } else {
+                to = input;
+            }
+        }
+        return new String[]{from, to};
+    }
+
+    // Checks the yyyy-MM-dd shape and that month and day are in range
+    static boolean isValidDate(String d) {
+        if (!d.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            return false;
+        }
+        int month = Integer.parseInt(d.substring(5, 7));
+        int day = Integer.parseInt(d.substring(8, 10));
+        return month >= 1 && month <= 12 && day >= 1 && day <= 31;
+    }
+
+    // ---------------- 1. PAYMENT REPORT ----------------
+    static void paymentReport(String from, String to) {
+        File[] files = new File(PAYMENT_FOLDER).listFiles((d, name) -> name.endsWith(".txt"));
+        int count = 0;
+        int total = 0;
+
+        if (files != null) {
+            Arrays.sort(files);
+            for (File f : files) {
+                try (Scanner fr = new Scanner(f)) {
+                    String id = fr.nextLine().trim();
+                    String date = fr.nextLine().replace("Date: ", "").trim();
+                    String customer = fr.nextLine().replace("Customer ID: ", "").trim();
+                    int amount = Integer.parseInt(fr.nextLine().replace("Amount: ", "").trim());
+
+                    if (date.compareTo(from) >= 0 && date.compareTo(to) <= 0) {
+                        if (count == 0) {
+                            System.out.println("\n===== PAYMENT REPORT (" + from + " to " + to + ") =====");
+                            System.out.println(String.format("%-6s %-12s %-12s %s", "No.", "Date", "Customer", "Amount"));
+                        }
+                        System.out.println(String.format("%-6s %-12s %-12s PHP %d", id, date, customer, amount));
+                        total += amount;
+                        count++;
+                    }
+                } catch (Exception ignored) { }
+            }
+        }
+
+        // Are There Any Transactions?
+        if (count == 0) {
+            System.out.println("\nNo Payment Records Found");
+            return;
+        }
+
+        // Calculate Total Payments Received -> Display Payment Transaction Details and Total
+        System.out.println("---------------------------------------------");
+        System.out.println("Transactions: " + count);
+        System.out.println("TOTAL PAYMENTS RECEIVED: PHP " + total);
+    }
+
+    // ---------------- 2. MENU & ORDER REPORT ----------------
+    static void orderReport(String from, String to) {
+        File[] files = new File(viewMenuOrder.ORDER_FOLDER).listFiles((d, name) -> name.endsWith(".txt"));
+        int count = 0;
+        int totalItems = 0;
+        int total = 0;
+
+        if (files != null) {
+            Arrays.sort(files);
+            for (File f : files) {
+                String[] o = readOrder(f);
+                if (o != null && o[1].compareTo(from) >= 0 && o[1].compareTo(to) <= 0) {
+                    if (count == 0) {
+                        System.out.println("\n===== MENU & ORDER REPORT (" + from + " to " + to + ") =====");
+                        System.out.println(String.format("%-6s %-12s %-12s %-8s %s", "No.", "Date", "Customer", "Items", "Total"));
+                    }
+                    System.out.println(String.format("%-6s %-12s %-12s %-8s PHP %s", o[0], o[1], o[2], o[3], o[4]));
+                    totalItems += Integer.parseInt(o[3]);
+                    total += Integer.parseInt(o[4]);
+                    count++;
+                }
+            }
+        }
+
+        // Are There Any Orders?
+        if (count == 0) {
+            System.out.println("\nNo Order Records Found");
+            return;
+        }
+
+        // Calculate Total Items Ordered -> Display Menu Order Details and Total
+        System.out.println("---------------------------------------------");
+        System.out.println("Orders: " + count);
+        System.out.println("TOTAL ITEMS ORDERED: " + totalItems);
+        System.out.println("TOTAL ORDER SALES: PHP " + total);
+    }
+
+    // ---------------- 3. TOTAL SALES REPORT ----------------
+    static void totalSalesReport(String from, String to) {
+        int payments = 0;
+        int orders = 0;
+
+        // Payments
+        File[] pFiles = new File(PAYMENT_FOLDER).listFiles((d, name) -> name.endsWith(".txt"));
+        if (pFiles != null) {
+            for (File f : pFiles) {
+                try (Scanner fr = new Scanner(f)) {
+                    fr.nextLine();
+                    String date = fr.nextLine().replace("Date: ", "").trim();
+                    fr.nextLine();
+                    int amount = Integer.parseInt(fr.nextLine().replace("Amount: ", "").trim());
+                    if (date.compareTo(from) >= 0 && date.compareTo(to) <= 0) {
+                        payments += amount;
+                    }
+                } catch (Exception ignored) { }
+            }
+        }
+
+        // Orders
+        File[] oFiles = new File(viewMenuOrder.ORDER_FOLDER).listFiles((d, name) -> name.endsWith(".txt"));
+        if (oFiles != null) {
+            for (File f : oFiles) {
+                String[] o = readOrder(f);
+                if (o != null && o[1].compareTo(from) >= 0 && o[1].compareTo(to) <= 0) {
+                    orders += Integer.parseInt(o[4]);
+                }
+            }
+        }
+
+        // Calculate Total Revenue -> Display Total Sales Report
+        System.out.println("\n===== TOTAL SALES REPORT (" + from + " to " + to + ") =====");
+        System.out.println("Payments (computer time) : PHP " + payments);
+        System.out.println("Menu & Orders            : PHP " + orders);
+        System.out.println("-----------------------------------------");
+        System.out.println("TOTAL REVENUE            : PHP " + (payments + orders));
+    }
+
+    // ---------------- FILE HELPERS ----------------
+    static String[] readOrder(File f) {
+        try (Scanner fr = new Scanner(f)) {
+            String id = fr.nextLine().trim();
+            String date = fr.nextLine().replace("Date: ", "").trim();
+            String customer = fr.nextLine().replace("Customer ID: ", "").trim();
+            fr.nextLine();
+
+            int items = 0;
+            String total = "0";
+            while (fr.hasNextLine()) {
+                String line = fr.nextLine().trim();
+                if (line.startsWith("Item: ")) {
+                    int x = line.lastIndexOf(" x");
+                    int eq = line.indexOf(" = ");
+                    items += Integer.parseInt(line.substring(x + 2, eq).trim());
+                } else if (line.startsWith("Total: ")) {
+                    total = line.replace("Total: ", "").trim();
+                }
+            }
+            return new String[]{id, date, customer, String.valueOf(items), total};
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+}
