@@ -1,3 +1,10 @@
-Burger,Food,85.0,15
-Iced Coffee,Drink,65.0,41
-Fries,Food,45.0,30
+Coke,Drink,25.0,45
+Mineral Water,Drink,15.0,47
+Coffee,Drink,30.0,37
+Iced Tea,Drink,20.0,30
+Chips,Food,15.0,27
+Instant Noodles,Food,35.0,18
+Sandwich,Food,45.0,12
+Burger,Food,60.0,15
+Matcha,Drink,30.0,18
+Sushi,Food,35.0,50
