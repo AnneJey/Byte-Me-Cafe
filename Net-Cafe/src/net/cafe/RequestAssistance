@@ -1,0 +1,165 @@
+package net.cafe;
+import java.util.*;
+import java.io.*;
+
+public class RequestAssistance {
+    static Scanner sc = ByteMeCafe.sc;
+    static final String FOLDER = "assistance";   // one .txt file per request
+
+    // ---------------- CUSTOMER SIDE: REQUEST ASSISTANCE ----------------
+    static void requestAssistance(String customerId) {
+        new File(FOLDER).mkdirs();
+
+        // Enter Issue -> Is Issue Valid? (No -> Display Invalid Request -> Enter Issue again)
+        String issue = "";
+        boolean valid = false;
+        while (!valid) {
+            System.out.print("\nEnter Issue: ");
+            issue = sc.nextLine().trim();
+            if (issue.length() >= 5) {
+                valid = true;
+            } else {
+                System.out.println("Invalid Request (describe the issue in at least 5 characters)");
+            }
+        }
+
+        // Enter PC ID
+        String pcId = "";
+        while (pcId.isEmpty()) {
+            System.out.print("Enter PC ID: ");
+            pcId = sc.nextLine().trim();
+            if (pcId.isEmpty()) {
+                System.out.println("PC ID cannot be empty.");
+            }
+        }
+
+        // Save Request as Pending with the PC ID and Customer ID
+        String id = nextRequestId();
+        if (saveRequest(id, customerId, pcId, issue, "Pending")) {
+            System.out.println("\nRequest saved as Pending (Request ID " + id + ")");
+            // Notify Staff
+            System.out.println("Staff has been notified. Please wait for assistance.");
+        }
+        // End -> back to Customer Menu
+    }
+
+    // ---------------- STAFF SIDE: HANDLE REQUESTS ----------------
+    // Call this from the Staff menu
+    static void handleRequests() {
+        new File(FOLDER).mkdirs();
+
+        boolean handling = true;
+        while (handling) {
+            // Notify Staff: show the pending requests
+            int pending = displayPending();
+            if (pending == 0) {
+                System.out.println("\nNo pending requests.");
+                return;
+            }
+
+            System.out.print("\nEnter request ID to handle (0 to go back): ");
+            String input = sc.nextLine().trim();
+            if (input.equals("0")) {
+                return;
+            }
+
+            File f = new File(FOLDER + "/" + input + ".txt");
+            String[] r = readRequest(f);
+            if (r == null || !r[4].equals("Pending")) {
+                System.out.println("Invalid request ID.");
+                continue;
+            }
+
+            // Staff Handles Request
+            System.out.println("\nHandling request " + r[0] + " (PC " + r[2] + "): " + r[3]);
+
+            // Request Resolved?
+            String resolved = "";
+            while (!resolved.equalsIgnoreCase("Y") && !resolved.equalsIgnoreCase("N")) {
+                System.out.print("Request resolved? (Y/N): ");
+                resolved = sc.nextLine().trim();
+            }
+
+            if (resolved.equalsIgnoreCase("Y")) {
+                // Status Set To Resolved
+                if (saveRequest(r[0], r[1], r[2], r[3], "Resolved")) {
+                    System.out.println("Status set to Resolved.");
+                }
+            } else {
+                // No -> back to Notify Staff (stays Pending)
+                System.out.println("Request is still Pending. Staff notified again.");
+            }
+        }
+    }
+
+    // Shows all Pending requests. Returns how many there are.
+    static int displayPending() {
+        File[] files = new File(FOLDER).listFiles((d, name) -> name.endsWith(".txt"));
+        int count = 0;
+        if (files != null) {
+            for (File f : files) {
+                String[] r = readRequest(f);
+                if (r != null && r[4].equals("Pending")) {
+                    if (count == 0) {
+                        System.out.println("\n===== Pending Assistance Requests =====");
+                    }
+                    System.out.println("Request " + r[0] + " | Customer " + r[1] + " | PC " + r[2]);
+                    System.out.println("   Issue: " + r[3]);
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    // ---------------- FILE HELPERS ----------------
+    // Generates 001, 002, 003, ...
+    static String nextRequestId() {
+        File[] files = new File(FOLDER).listFiles((d, name) -> name.endsWith(".txt"));
+        int max = 0;
+        if (files != null) {
+            for (File f : files) {
+                try {
+                    int n = Integer.parseInt(f.getName().replace(".txt", ""));
+                    if (n > max) max = n;
+                } catch (NumberFormatException ignored) { }
+            }
+        }
+        return String.format("%03d", max + 1);
+    }
+
+    // Each request has its own file: assistance/001.txt
+    // File format:
+    // 001
+    // Customer ID: ...
+    // PC ID: ...
+    // Issue: ...
+    // Status: Pending / Resolved
+    static boolean saveRequest(String id, String customerId, String pcId, String issue, String status) {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(FOLDER + "/" + id + ".txt"))) {
+            pw.println(id);
+            pw.println("Customer ID: " + customerId);
+            pw.println("PC ID: " + pcId);
+            pw.println("Issue: " + issue);
+            pw.println("Status: " + status);
+            return true;
+        } catch (IOException e) {
+            System.out.println("An error occurred while saving the request.");
+            return false;
+        }
+    }
+
+    // Reads one request file. Returns {id, customerId, pcId, issue, status} or null.
+    static String[] readRequest(File f) {
+        try (Scanner fr = new Scanner(f)) {
+            String id = fr.nextLine().trim();
+            String customerId = fr.nextLine().replace("Customer ID: ", "").trim();
+            String pcId = fr.nextLine().replace("PC ID: ", "").trim();
+            String issue = fr.nextLine().replace("Issue: ", "").trim();
+            String status = fr.nextLine().replace("Status: ", "").trim();
+            return new String[]{id, customerId, pcId, issue, status};
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+}
