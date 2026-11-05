@@ -38,13 +38,13 @@ public class Customer {
                     RequestAssistance.requestAssistance(currentId);
                     break;
                 case "0":
-                    System.out.println("\nOpening Log Out Menu...");
+                    System.out.println("Opening Log Out Menu...\n");
                     currentId = null;
                     currentName = null;
                     NetCafe.logOut();
                     return;
                 default:
-                    System.out.println("\nInvalid choice. Please try again.");
+                    System.out.println("Invalid choice. Please try again.\n");
             }
         }
     }
