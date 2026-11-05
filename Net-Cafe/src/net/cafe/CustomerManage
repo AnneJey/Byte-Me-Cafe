@@ -1,0 +1,376 @@
+package net.cafe;
+
+import java.util.*;
+import java.io.*;
+
+public class CustomerManage {
+    static Scanner sc = NetCafe.sc;
+    static final String FOLDER = "customers";            
+    static final String SESSION_FOLDER = "sessions";   
+    static final String TRANSACTIONS = "transactions.txt";
+
+    // ---------------- START: MANAGE CUSTOMERS (STAFF AND ADMIN) ----------------
+    static void manage() {
+        new File(FOLDER).mkdirs();
+
+        boolean running = true;
+        while (running) {
+            // Display menu
+            System.out.println("\n===== MANAGE CUSTOMERS =====");
+            System.out.println("1. Register Customer");
+            System.out.println("2. Search Customer");
+            System.out.println("3. Top Up Balance");
+            System.out.println("4. View Sessions");
+            System.out.println("0. Back");
+            System.out.print("Enter choice: ");
+            String choice = sc.nextLine().trim();
+
+            switch (choice) {
+                case "1": registerCustomer(); break;
+                case "2": searchCustomer(); break;
+                case "3": topUpBalance(); break;
+                case "4": viewSessions(); break;
+                case "0": running = false; break;
+                default: System.out.println("Invalid choice. Try again.");
+            }
+        }
+
+    }
+
+    // ---------------- 1. REGISTER CUSTOMER ----------------
+    static void registerCustomer() {
+        boolean done = false;
+        while (!done) {
+            // Enter Name, Username, Email, Password, and Confirm Password
+            System.out.println("\n--- Register Customer (type 0 as Name to cancel) ---");
+            System.out.print("Name: ");
+            String name = sc.nextLine().trim();
+            if (name.equals("0")) {
+                return;
+            }
+            System.out.print("Username: ");
+            String username = sc.nextLine().trim();
+            System.out.print("Email: ");
+            String email = sc.nextLine().trim();
+            System.out.print("Password: ");
+            String password = sc.nextLine().trim();
+            System.out.print("Confirm Password: ");
+            String confirm = sc.nextLine().trim();
+
+            // Are all fields filled?
+            if (name.isEmpty() || username.isEmpty() || email.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
+                System.out.println("All Fields Must Be Filled");
+            }
+            // Is Password and Confirm Password the same?
+            else if (!password.equals(confirm)) {
+                System.out.println("Password Must Match");
+            }
+            // Are details valid and unused?
+            else if (username.contains(" ") || !email.contains("@") || !email.contains(".")) {
+                System.out.println("Invalid username or email. Username must have no spaces and email must be valid.");
+            } else if (usernameUsed(username) || emailUsed(email)) {
+                System.out.println("Account already exist. Please Create Another One");
+            } else {
+                // Display "Registration Success" -> Generate ID and Save Account
+                String id = generateId();
+                if (saveCustomer(id, name, username, email, password, "0")) {
+                    System.out.println("Registration Success");
+                    System.out.println("Customer ID: " + id);
+                }
+                done = true;
+            }
+        }
+    }
+
+    // ---------------- 2. SEARCH CUSTOMER ----------------
+    static void searchCustomer() {
+        // Enter ID or username -> Does Account ID exist? (No -> Display "Account Doesn't exist" -> again)
+        String[] c = askCustomer();
+        if (c == null) {
+            return;
+        }
+        // Display Account Details
+        showCustomer(c);
+    }
+
+    // ---------------- 3. TOP UP BALANCE ----------------
+    static void topUpBalance() {
+        // Enter ID or username -> Does Account ID exist?
+        String[] c = askCustomer();
+        if (c == null) {
+            return;
+        }
+
+        // Enter Top Up Amount, PC ID and Payment Method -> Is Input valid? (No -> error -> again)
+        int amount = 0;
+        String[] pc = null;
+        String method = "";
+        boolean valid = false;
+        while (!valid) {
+            System.out.println("\n--- Top Up ---");
+            System.out.print("Top Up Amount (PHP): ");
+            String amountText = sc.nextLine().trim();
+            
+            System.out.print("PC ID: ");
+            String pcId = sc.nextLine().trim().toUpperCase();
+            System.out.println("Payment Method:");
+            System.out.println("1. Cash");
+            System.out.println("2. GCash");
+            System.out.println("3. Card");
+            System.out.print("Enter choice: ");
+            String m = sc.nextLine().trim();
+
+            try {
+                amount = Integer.parseInt(amountText);
+            } catch (NumberFormatException e) {
+                amount = 0;
+            }
+            pc = CompManage.readComputer(pcId);   
+
+            if (amount <= 0) {
+                System.out.println("Invalid amount. Enter a whole number greater than 0.");
+            } else if (pc == null) {
+                System.out.println("Computer Does Not Exist");
+            } else if (m.equals("1")) {
+                method = "Cash";
+                valid = true;
+            } else if (m.equals("2")) {
+                method = "GCash";
+                valid = true;
+            } else if (m.equals("3")) {
+                method = "Card";
+                valid = true;
+            } else {
+                System.out.println("Invalid payment method.");
+            }
+        }
+
+        // Display Receipt (balance converts to hours using the computer's hourly rate)
+        int rate = 0;
+        try {
+            rate = Integer.parseInt(pc[1]);
+        } catch (NumberFormatException e) {
+            rate = 0;
+        }
+        int newBalance = Integer.parseInt(c[5]) + amount;
+        System.out.println("\n===== TOP UP RECEIPT =====");
+        System.out.println("Customer    : " + c[1] + " (" + c[0] + ")");
+        System.out.println("PC ID       : " + pc[0]);
+        System.out.println("Hourly Rate : PHP " + pc[1]);
+        System.out.println("Payment     : " + method);
+        System.out.println("Top Up      : PHP " + amount);
+        if (rate > 0) {
+            System.out.println("Hours Added : " + String.format("%.2f", (double) amount / rate));
+        }
+        System.out.println("New Balance : PHP " + newBalance);
+
+        // Confirm Top Up?
+        String confirm = "";
+        while (!confirm.toUpperCase().equals("Y") && !confirm.toUpperCase().equals("N")) {
+            System.out.print("Confirm Top Up? (Y/N): ");
+            confirm = sc.nextLine().trim();
+        }
+
+        if (confirm.toUpperCase().equals("Y")) {
+            // Display "Top Up successful" -> Save Transaction
+            c[5] = String.valueOf(newBalance);
+            if (saveCustomer(c[0], c[1], c[2], c[3], c[4], c[5])) {
+                saveTransaction(c[0], pc[0], method, amount);
+                System.out.println("Top Up successful");
+            }
+        } else {
+            System.out.println("Top Up cancelled");
+        }
+    }
+
+    // ---------------- 4. VIEW SESSIONS ----------------
+    static void viewSessions() {
+        // Enter ID or username -> Does Account ID exist?
+        String[] c = askCustomer();
+        if (c == null) {
+            return;
+        }
+
+        // Are there any Sessions? (No -> Display "No Sessions Found")
+        File f = new File(SESSION_FOLDER + "/" + c[0] + ".txt");
+        boolean found = false;
+        if (f.exists()) {
+            try (Scanner fr = new Scanner(f)) {
+                System.out.println("\n--- Sessions of " + c[1] + " (" + c[0] + ") ---");
+                while (fr.hasNextLine()) {
+                    String line = fr.nextLine();
+                    if (!line.trim().isEmpty()) {
+                        System.out.println(line);
+                        found = true;
+                    }
+                }
+            } catch (Exception e) {
+                found = false;
+            }
+        }
+        if (!found) {
+            System.out.println("No Sessions Found");
+        }
+    }
+
+    // ---------------- ASK FOR CUSTOMER (ID OR USERNAME) ----------------
+    static String[] askCustomer() {
+        String[] c = null;
+        while (c == null) {
+            System.out.print("\nEnter ID or username: ");
+            String input = sc.nextLine().trim();
+            c = findCustomer(input);
+            if (c == null) {
+                System.out.println("Account Doesn't exist");
+            }
+        }
+        return c;
+    }
+
+    // ---------------- DISPLAY ----------------
+    static void showCustomer(String[] c) {
+        System.out.println("\n--- Account Details ---");
+        System.out.println("ID       : " + c[0]);
+        System.out.println("Name     : " + c[1]);
+        System.out.println("Username : " + c[2]);
+        System.out.println("Email    : " + c[3]);
+        System.out.println("Balance  : PHP " + c[5]);
+    }
+
+    // ---------------- SEARCH HELPERS ----------------
+    // Finds a customer by ID first, then by username. Returns null if not found.
+    static String[] findCustomer(String input) {
+        String[] c = readCustomer(input);
+        if (c != null) {
+            return c;
+        }
+        File[] files = new File(FOLDER).listFiles((d, name) -> name.endsWith(".txt"));
+        if (files == null) {
+            return null;
+        }
+        for (File f : files) {
+            String[] other = readCustomer(f.getName().replace(".txt", ""));
+            if (other != null && other[2].toLowerCase().equals(input.toLowerCase())) {
+                return other;
+            }
+        }
+        return null;
+    }
+
+    static boolean usernameUsed(String username) {
+        File[] files = new File(FOLDER).listFiles((d, name) -> name.endsWith(".txt"));
+        if (files == null) {
+            return false;
+        }
+        for (File f : files) {
+            String[] other = readCustomer(f.getName().replace(".txt", ""));
+            if (other != null && other[2].toLowerCase().equals(username.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static boolean emailUsed(String email) {
+        File[] files = new File(FOLDER).listFiles((d, name) -> name.endsWith(".txt"));
+        if (files == null) {
+            return false;
+        }
+        for (File f : files) {
+            String[] other = readCustomer(f.getName().replace(".txt", ""));
+            if (other != null && other[3].toLowerCase().equals(email.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Next ID = highest existing ID + 1, written as 3 digits (001, 002, ...)
+    static String generateId() {
+        int max = 0;
+        File[] files = new File(FOLDER).listFiles((d, name) -> name.endsWith(".txt"));
+        if (files != null) {
+            for (File f : files) {
+                String name = f.getName().replace(".txt", "");
+                if (name.matches("[0-9]+")) {
+                    int n = Integer.parseInt(name);
+                    if (n > max) {
+                        max = n;
+                    }
+                }
+            }
+        }
+        return String.format("%03d", max + 1);
+    }
+
+    // ---------------- FILE HELPERS ----------------
+    // Each customer has its own file: customers/001.txt
+    // File format:
+    // 001
+    // Name: Jane Lawrette
+    // Username: lawrjne1
+    // Email: jlawrette@email.com
+    // Password: JLaw456
+    // Balance: 0
+    static boolean saveCustomer(String id, String name, String username, String email, String password, String balance) {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(FOLDER + "/" + id + ".txt"))) {
+            pw.println(id);
+            pw.println("Name: " + name);
+            pw.println("Username: " + username);
+            pw.println("Email: " + email);
+            pw.println("Password: " + password);
+            pw.println("Balance: " + balance);
+            return true;
+        } catch (IOException e) {
+            System.out.println("An error occurred while saving the customer.");
+            return false;
+        }
+    }
+
+    // Reads one customer by ID. Returns {id, name, username, email, password, balance} or null.
+    // Old files with no "Balance:" line are treated as balance 0.
+    static String[] readCustomer(String id) {
+        if (!id.matches("[0-9]+")) {
+            return null;
+        }
+        File f = new File(FOLDER + "/" + id + ".txt");
+        String name = "";
+        String username = "";
+        String email = "";
+        String password = "";
+        String balance = "0";
+        try (Scanner fr = new Scanner(f)) {
+            String cid = fr.nextLine().trim();
+            while (fr.hasNextLine()) {
+                String line = fr.nextLine();
+                if (line.startsWith("Name: ")) {
+                    name = line.replace("Name: ", "").trim();
+                } else if (line.startsWith("Username: ")) {
+                    username = line.replace("Username: ", "").trim();
+                } else if (line.startsWith("Email: ")) {
+                    email = line.replace("Email: ", "").trim();
+                } else if (line.startsWith("Password: ")) {
+                    password = line.replace("Password: ", "").trim();
+                } else if (line.startsWith("Balance: ")) {
+                    balance = line.replace("Balance: ", "").trim();
+                }
+            }
+            if (!balance.matches("[0-9]+")) {
+                balance = "0";
+            }
+            return new String[]{cid, name, username, email, password, balance};
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+
+    // Adds one line to transactions.txt
+    // Adds one line to transactions.txt
+    static void saveTransaction(String customerId, String pcId, String method, int amount) {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(TRANSACTIONS, true))) {
+            pw.println("TOP UP | " + TransactionHistory.now() + " | Customer " + customerId + " | " + pcId + " | " + method + " | PHP " + amount);
+        } catch (IOException e) {
+            System.out.println("An error occurred while saving the transaction.");
+        }
+    }
+}
