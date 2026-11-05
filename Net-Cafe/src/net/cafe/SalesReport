@@ -1,4 +1,5 @@
 package net.cafe;
+
 import java.util.*;
 import java.io.*;
 
@@ -16,8 +17,14 @@ public class SalesReport {
         System.out.println("1. Payment Report");
         System.out.println("2. Menu & Order Report");
         System.out.println("3. Total Sales Report");
+        System.out.println("0. Back");
+        System.out.println("---");
         System.out.print("Enter Choice: ");
         String choice = sc.nextLine().trim();
+
+        if (choice.equals("0")) {
+        return;
+    }
 
         if (!choice.equals("1") && !choice.equals("2") && !choice.equals("3")) {
             System.out.println("Invalid choice.");
@@ -39,34 +46,39 @@ public class SalesReport {
 
     // ---------------- SELECT DATE RANGE ----------------
     static String[] selectDateRange() {
-        System.out.println("\nSelect Date Range (format: yyyy-MM-dd)");
+        System.out.println("\nSelect Date Range (format: yyyy-MM-dd, 0 to cancel)");
 
         String from = "";
         while (from.isEmpty()) {
             System.out.print("From: ");
             String input = sc.nextLine().trim();
+            if (input.equals("0")) {
+                return null;
+            }
             if (isValidDate(input)) {
                 from = input;
             } else {
-                System.out.println("Invalid date.");
+                System.out.println("Invalid date. Use yyyy-MM-dd (example: 2026-11-05).");
             }
         }
 
-        String to = "";
-        while (to.isEmpty()) {
-            System.out.print("To: ");
-            String input = sc.nextLine().trim();
-
-            if (!isValidDate(input)) {
-                System.out.println("Invalid date.");
-            } else if (input.compareTo(from) < 0) {
-                System.out.println("'To' date cannot be before the 'From' date.");
-            } else {
-                to = input;
-            }
+    String to = "";
+    while (to.isEmpty()) {
+        System.out.print("To: ");
+        String input = sc.nextLine().trim();
+        if (input.equals("0")) {
+            return null;
         }
-        return new String[]{from, to};
+        if (!isValidDate(input)) {
+            System.out.println("Invalid date. Use yyyy-MM-dd (example: 2026-11-05).");
+        } else if (input.compareTo(from) < 0) {
+            System.out.println("'To' date cannot be before the 'From' date.");
+        } else {
+            to = input;
+        }
     }
+    return new String[]{from, to};
+}
 
     // Checks the yyyy-MM-dd shape and that month and day are in range
     static boolean isValidDate(String d) {
