@@ -1,0 +1,5 @@
+006
+Customer ID: 006
+PC ID: PC-06
+Issue: Internet is very slow
+Status: Pending

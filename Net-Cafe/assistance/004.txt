@@ -1,0 +1,5 @@
+004
+Customer ID: 002
+PC ID: PC-03
+Issue: Cannot hear sound from headset
+Status: Pending

@@ -1,0 +1,5 @@
+003
+Customer ID: 004
+PC ID: PC-04
+Issue: Monitor shows no signal
+Status: Resolved

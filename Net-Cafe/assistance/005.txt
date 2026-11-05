@@ -1,0 +1,5 @@
+005
+Customer ID: 005
+PC ID: PC-01
+Issue: Keyboard keys are stuck
+Status: Resolved
