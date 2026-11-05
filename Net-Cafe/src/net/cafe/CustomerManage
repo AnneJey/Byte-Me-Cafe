@@ -1,10 +1,9 @@
 package net.cafe;
-
 import java.util.*;
 import java.io.*;
 
 public class CustomerManage {
-    static Scanner sc = NetCafe.sc;
+    static Scanner sc = ByteMeCafe.sc;
     static final String FOLDER = "customers";            
     static final String SESSION_FOLDER = "sessions";   
     static final String TRANSACTIONS = "transactions.txt";
