@@ -11,6 +11,9 @@ public class RequestAssistance {
         new File(FOLDER).mkdirs();
 
         // Enter Issue -> Is Issue Valid? (No -> Display Invalid Request -> Enter Issue again)
+        System.out.println("\n========================");
+        System.out.println("   Request Assistance   ");
+        System.out.println("========================");
         String issue = "";
         boolean valid = false;
         while (!valid) {
