@@ -1,10 +1,9 @@
 package net.cafe;
-
 import java.util.*;
 import java.io.*;
 
 public class AssistanceManage {
-    static Scanner sc = NetCafe.sc;
+    static Scanner sc = ByteMeCafe.sc;
 
     // ---------------- START: ASSISTANCE MANAGEMENT (STAFF) ----------------
     static void manage() {
