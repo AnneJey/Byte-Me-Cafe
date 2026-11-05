@@ -1,0 +1,6 @@
+008
+Name: Paolo Dizon
+Username: paolod
+Email: pdizon@email.com
+Password: Paolo88
+Balance: 45

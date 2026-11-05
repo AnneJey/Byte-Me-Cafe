@@ -1,0 +1,6 @@
+002
+Name: Francisco Lachowski
+Username: chicolachosk1
+Email: chixksi@email.com
+Password: francis_lachowsk1
+Balance: 0

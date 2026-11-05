@@ -1,0 +1,6 @@
+004
+Name: Anne Jey
+Username: Anne
+Email: annejey@email.com
+Password: Anne12
+Balance: 300

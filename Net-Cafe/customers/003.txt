@@ -1,0 +1,6 @@
+003
+Name: Mars Deblote
+Username: MarsMisc
+Email: mmisc@email.com
+Password: M4R5misc
+Balance: 75

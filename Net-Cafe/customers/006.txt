@@ -1,0 +1,6 @@
+006
+Name: Carlo Reyes
+Username: carlor
+Email: creyes@email.com
+Password: Carlo123
+Balance: 500

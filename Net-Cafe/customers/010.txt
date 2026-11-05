@@ -1,0 +1,6 @@
+010
+Name: Hai
+Username: Hi
+Email: Haihai@email.com
+Password: Ha12
+Balance: 0
