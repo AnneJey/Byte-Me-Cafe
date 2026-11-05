@@ -1,3 +1,13 @@
-001,PC001,60
-002,PC003,30002,Session+Food,20.0
-001,Session+Food,250.0
+TOP UP | 2026-10-30 10:15 | Customer 001 | PC-01 | Cash | PHP 100
+TOP UP | 2026-10-30 14:40 | Customer 004 | PC-03 | GCash | PHP 200
+TOP UP | 2026-10-31 09:05 | Customer 003 | PC-02 | Cash | PHP 50
+TOP UP | 2026-10-31 16:20 | Customer 006 | PC-05 | Card | PHP 300
+TOP UP | 2026-11-01 11:30 | Customer 001 | PC-02 | GCash | PHP 100
+TOP UP | 2026-11-01 13:10 | Customer 005 | PC-01 | Cash | PHP 40
+TOP UP | 2026-11-02 15:45 | Customer 002 | PC-03 | Cash | PHP 60
+TOP UP | 2026-11-03 10:00 | Customer 008 | PC-06 | GCash | PHP 100
+TOP UP | 2026-11-03 18:25 | Customer 004 | PC-04 | Card | PHP 150
+TOP UP | 2026-11-04 12:50 | Customer 006 | PC-06 | Cash | PHP 250
+TOP UP | 2026-11-04 17:35 | Customer 003 | PC-06 | GCash | PHP 75
+TOP UP | 2026-11-05 09:20 | Customer 007 | PC-05 | Cash | PHP 100
+TOP UP | 2026-11-06 00:00 | Customer 009 | PC-03 | Card | PHP 50
