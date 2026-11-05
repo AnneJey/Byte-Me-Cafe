@@ -1,0 +1,7 @@
+003
+Date: 2026-11-03
+Customer ID: 004
+Customer Name: Anne Jey
+Item: Sandwich x2 = 90
+Item: Coffee x2 = 60
+Total: 150

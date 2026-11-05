@@ -1,0 +1,7 @@
+007
+Date: 2026-11-05
+Customer ID: 009
+Customer Name: Jian Anne
+Item: Coffee x20 = 600
+Item: Chips x5 = 100
+Total: 700

@@ -1,0 +1,7 @@
+002
+Date: 2026-11-02
+Customer ID: 003
+Customer Name: Mars Deblote
+Item: Instant Noodles x1 = 35
+Item: Mineral Water x1 = 15
+Total: 50

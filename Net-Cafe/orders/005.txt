@@ -1,0 +1,6 @@
+005
+Date: 2026-11-04
+Customer ID: 005
+Customer Name: Jianne Ocapan
+Item: Coffee x1 = 30
+Total: 30
